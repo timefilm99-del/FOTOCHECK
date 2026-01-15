@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+
+<html data-wf-page="673c9e45ffc846edd50ea304" data-wf-site="673c9e44ffc846edd50ea2ba" lang="es-PE">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <title>Generador de Fotocheck - Idelcom</title>
+
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+
+ 
+
+  <link href="css/normalize.css" rel="stylesheet" type="text/css">
+
+  <link href="css/webflow.css" rel="stylesheet" type="text/css">
+
+  <link href="css/idelcom.webflow.css" rel="stylesheet" type="text/css">
+
+ 
+
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js" type="text/javascript"></script>
+
+  <script type="text/javascript">WebFont.load({ google: { families: ["Hanken Grotesk:100,200,300,regular,500,600,700,800,900","Nunito Sans:200,300,regular,500,600,700,800,900"] }});</script>
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+
+  <style>
+
+    /* Estilos SOLO para la maquetación de 2 columnas (NO afectan al diseño del fotocheck) */
+
+    body {
+
+      background-color: #f4f4f4;
+
+      margin: 0;
+
+      min-height: 100vh;
+
+      display: flex;
+
+      flex-direction: column;
+
+    }
+
+
+
+    .navbar-top {
+
+      background: white;
+
+      padding: 15px 40px;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      border-bottom: 1px solid #ddd;
+
+    }
+
+
+
+    .link-externo {
+
+      color: #F37023;
+
+      text-decoration: none;
+
+      font-weight: 600;
+
+      border: 1px solid #F37023;
+
+      padding: 8px 16px;
+
+      border-radius: 4px;
+
+      font-family: 'Nunito Sans', sans-serif;
+
+    }
+
+
+
+    /* CONTENEDOR PRINCIPAL */
+
+    .main-layout {
+
+      display: flex;
+
+      flex-direction: row;
+
+      justify-content: center;
+
+      align-items: flex-start;
+
+      gap: 40px;
+
+      padding: 40px;
+
+      flex-wrap: wrap;
+
+    }
+
+
+
+    .preview-section {
+
+      flex: 0 0 auto;
+
+    }
+
+
+
+    .form-section {
+
+      flex: 0 0 400px;
+
+      background: white;
+
+      padding: 30px;
+
+      border-radius: 12px;
+
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+
+      font-family: 'Nunito Sans', sans-serif;
+
+    }
+
+
+
+    /* Estilos del Formulario */
+
+    .form-group { margin-bottom: 15px; }
+
+    .form-group label { display: block; font-size: 13px; font-weight: 700; color: #555; margin-bottom: 5px; }
+
+    .form-group small { display: block; font-size: 11px; color: #888; margin-bottom: 5px; font-style: italic; }
+
+    .form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+
+    .form-control:focus { border-color: #F37023; outline: none; }
+
+
+
+    .btn-upload {
+
+      display: block; width: 100%; padding: 10px;
+
+      background-color: #f1f1f1; color: #333;
+
+      border: 1px dashed #aaa; border-radius: 6px;
+
+      text-align: center; cursor: pointer; font-size: 14px; margin-top: 5px;
+
+    }
+
+    .btn-download {
+
+      display: block; width: 100%; padding: 15px;
+
+      background-color: #F37023; color: white;
+
+      border: none; border-radius: 6px; font-size: 16px;
+
+      font-weight: bold; cursor: pointer; margin-top: 20px;
+
+    }
+
+    .btn-download:hover { background-color: #d65a12; }
+
+   
+
+    #input-file-raw { display: none; }
+
+
+
+  </style>
+
+</head>
+
+<body>
+
+
+
+  <nav class="navbar-top">
+
+    <h3 style="margin:0; font-family:'Nunito Sans'; color:#333;">GENERADOR DE FOTOCHECK - IDELCOM</h3>
+
+    <a href="PLANTILLAA4.html" class="link-externo" target="_blank">Ir a Dashboard</a>
+
+  </nav>
+
+
+
+  <div class="main-layout">
+
+   
+
+    <div class="preview-section">
+
+      <div class="identificador-idelcom" id="capture-target" style="background-color: white;">
+
+        <div class="div-identificacion">
+
+          <img src="img/ICONDNI.svg" loading="lazy" alt="" class="image-26">
+
+          <div class="dni"><strong class="bold-text-7" id="DISPLAY_DNI">123456789</strong></div>
+
+        </div>
+
+       
+
+        <div class="div-fotocheck">
+
+          <div class="imgen-contenedor-foto">
+
+            <img src="https://d3e54v103j8qbb.cloudfront.net/plugins/Basic/assets/placeholder.60f9b1840c.svg" loading="lazy" id="FOTO" alt="" class="foto">
+
+          </div>
+
+          <div class="div-info">
+
+            <div class="contenedor-texto">
+
+              <h1 id="APELLIDOYNOMBRE" class="apellidoynombre">GARCIA RAMIREZ JOSE</h1>
+
+              <div class="colro-linea"></div>
+
+              <div id="PUESTO" class="puesto">TÉCNICO ELECTRICISTA</div>
+
+              <div id="AREA" class="area">OPERACIONES</div>
+
+            </div>
+
+            <div class="div-derecho">
+
+              <div class="text-vertical">www.idelcom.pe</div>
+
+              <img src="img/LOGO IDELCOM.svg" loading="lazy" alt="" class="logo-tarjeta-div">
+
+            </div>
+
+          </div>
+
+          <div class="contenedor-circulo">
+
+            <div class="div-hueco">
+
+              <div class="circulo-hueco"></div>
+
+            </div>
+
+            <div class="circulo"></div>
+
+          </div>
+
+          <div class="white-div-container">
+
+            <div class="code-embed-7 w-embed">
+
+              <?xml version="1.0" encoding="UTF-8"?>
+
+              <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewbox="0 0 652 490">
+
+                <defs><style>.st0 {fill: #fafafa;}</style></defs>
+
+                <path class="st0" d="M353.91,0c21.85,0,43.1,7.16,60.49,20.37l38.08,28.93c17.4,13.22,38.65,20.37,60.49,20.37h139.02v420.32H0V.51C3.33.17,6.71,0,10.13,0h343.78Z"></path>
+
+              </svg>
+
+            </div>
+
+            <div class="emeveb-behinf w-embed">
+
+              <?xml version="1.0" encoding="UTF-8"?>
+
+              <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewbox="0 0 708.11 538">
+
+                <defs><style>.st0 {fill: #fafafa;}</style></defs>
+
+                <path class="st0" d="M569.09,69.68c-21.85,0-43.1-7.15-60.49-20.37l-38.09-28.93C453.12,7.16,431.87,0,410.02,0H66.24c-1.42,0-2.83.04-4.24.1v-.1H0v538h708.11V69.68h-139.02Z"></path>
+
+              </svg>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="form-section">
+
+      <h2 style="margin-top:0; border-bottom: 2px solid #F37023; padding-bottom:10px; color:#333;">Editar Datos</h2>
+
+     
+
+      <div class="form-group">
+
+        <label for="in-nombre">Apellidos y Nombres</label>
+
+        <small>⚠️ Solo incluir: Primer Apellido, Segundo Apellido y Primer Nombre.</small>
+
+        <input type="text" id="in-nombre" class="form-control" placeholder="Ej: GARCIA RAMIREZ JOSE" maxlength="30">
+
+      </div>
+
+
+
+      <div class="form-group">
+
+        <label for="in-puesto">Puesto / Cargo</label>
+
+        <input type="text" id="in-puesto" class="form-control" placeholder="Ej: TÉCNICO ELECTRICISTA">
+
+      </div>
+
+
+
+      <div class="form-group">
+
+        <label for="in-area">Área</label>
+
+        <small>⚠️ No colocar la palabra "Área" (solo el nombre).</small>
+
+        <input type="text" id="in-area" class="form-control" placeholder="Ej: OPERACIONES">
+
+      </div>
+
+
+
+      <div class="form-group">
+
+        <label for="in-dni">Número de DNI</label>
+
+        <input type="number" id="in-dni" class="form-control" placeholder="123456789">
+
+      </div>
+
+
+
+      <div class="form-group">
+
+        <label>Fotografía del colaborador</label>
+
+        <label for="input-file-raw" class="btn-upload">
+
+          📂 Seleccionar imagen (PNG)
+
+        </label>
+
+        <input type="file" id="input-file-raw" accept="image/png, image/jpeg">
+
+      </div>
+
+
+
+      <button onclick="downloadPDF()" class="btn-download">
+
+        ⬇ Descargar Fotocheck PDF
+
+      </button>
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js" type="text/javascript"></script>
+
+  <script src="js/webflow.js" type="text/javascript"></script>
+
+
+
+  <script>
+
+    // --- LÓGICA DEL GENERADOR ---
+
+
+
+    // 1. Enlace de inputs a los textos del diseño original
+
+    const inputs = {
+
+      nombre: document.getElementById('in-nombre'),
+
+      puesto: document.getElementById('in-puesto'),
+
+      area: document.getElementById('in-area'),
+
+      dni: document.getElementById('in-dni')
+
+    };
+
+
+
+    const displays = {
+
+      nombre: document.getElementById('APELLIDOYNOMBRE'),
+
+      puesto: document.getElementById('PUESTO'),
+
+      area: document.getElementById('AREA'),
+
+      dni: document.getElementById('DISPLAY_DNI')
+
+    };
+
+
+
+    function setupBinding(inputElement, displayElement, uppercase = true) {
+
+      inputElement.addEventListener('input', (e) => {
+
+        let val = e.target.value;
+
+        if(!val) val = "...";
+
+        displayElement.innerText = uppercase ? val.toUpperCase() : val;
+
+      });
+
+    }
+
+
+
+    setupBinding(inputs.nombre, displays.nombre);
+
+    setupBinding(inputs.puesto, displays.puesto);
+
+    setupBinding(inputs.area, displays.area);
+
+    setupBinding(inputs.dni, displays.dni, false);
+
+
+
+    // 2. Carga de Imagen
+
+    document.getElementById('input-file-raw').addEventListener('change', function(e) {
+
+      if (e.target.files && e.target.files[0]) {
+
+        const file = e.target.files[0];
+
+        const target = document.getElementById('FOTO');
+
+       
+
+        if (target) {
+
+          const reader = new FileReader();
+
+          reader.onload = function(event) {
+
+            target.src = event.target.result;
+
+            target.removeAttribute('srcset'); // Importante para Webflow
+
+          }
+
+          reader.readAsDataURL(file);
+
+        }
+
+      }
+
+    });
+
+
+
+    // 3. Generación de PDF (CORREGIDO: MEDIDAS EXACTAS SIN PADDING)
+
+    window.downloadPDF = function() {
+
+      const element = document.getElementById("capture-target");
+
+      const btn = document.querySelector('.btn-download');
+
+     
+
+      const originalText = btn.innerText;
+
+      btn.innerText = "Generando...";
+
+      btn.disabled = true;
+
+
+
+      html2canvas(element, {
+
+        scale: 3, // Mantiene alta calidad de captura
+
+        useCORS: true,
+
+        backgroundColor: "#ffffff",
+
+        scrollY: -window.scrollY // Evita cortes si el usuario hizo scroll
+
+      }).then(canvas => {
+
+        const { jsPDF } = window.jspdf;
+
+       
+
+        // Convertimos el canvas a imagen PNG
+
+        const imgData = canvas.toDataURL('image/png');
+
+       
+
+        // --- CONFIGURACIÓN DE MEDIDAS EXACTAS ---
+
+        // Ancho y alto solicitado:
+
+        const pdfWidth = 652;
+
+        const pdfHeight = 1039;
+
+
+
+        // Creamos PDF en unidades 'px' con el tamaño exacto del diseño
+
+        const pdf = new jsPDF('p', 'px', [pdfWidth, pdfHeight]);
+
+       
+
+        // Agregamos la imagen en coordenadas 0,0 ocupando todo el ancho y alto
+
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+       
+
+        // Generar nombre de archivo
+
+        let filename = inputs.nombre.value || "fotocheck";
+
+        filename = filename.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+       
+
+        // Guardar
+
+        pdf.save(`${filename}.pdf`);
+
+
+
+        btn.innerText = originalText;
+
+        btn.disabled = false;
+
+      }).catch(err => {
+
+        console.error(err);
+
+        alert("Hubo un error al generar el PDF: " + err.message);
+
+        btn.innerText = originalText;
+
+        btn.disabled = false;
+
+      });
+
+    };
+
+  </script>
+
+</body>
+
+</html>

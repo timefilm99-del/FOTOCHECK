@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html data-wf-page="69498601864971434b35e8b9" data-wf-site="673c9e44ffc846edd50ea2ba" lang="es-PE">
+<head>
+  <meta charset="utf-8">
+  <title>PLANTILLA A4</title>
+  <link href="css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="css/webflow.css" rel="stylesheet" type="text/css">
+  <link href="css/idelcom.webflow.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+  <div class="w-embed w-script">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <script>
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <style>
+      /* --- Estilos Generales --- */
+      .app-layout {
+        display: flex; flex-direction: column; align-items: center;
+        background-color: #e6e6e6; padding: 20px;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      .btn-print {
+        background-color: #222; color: #fff; padding: 12px 24px;
+        border-radius: 4px; cursor: pointer; font-weight: 600;
+        margin-bottom: 20px; border: none; transition: opacity 0.2s;
+      }
+      .btn-print:hover { opacity: 0.8; }
+      .btn-print:disabled { background-color: #888; cursor: wait; }
+
+      /* --- Hoja A4 --- */
+      .paper-a4 {
+        width: 210mm; height: 297mm; background: white;
+        display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(5, 1fr);
+        justify-items: center; align-items: center; padding: 15mm; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15); box-sizing: border-box; 
+      }
+
+      /* --- Slot / Marco --- */
+      .card-slot {
+        width: 78.009mm; height: 49mm; 
+        border: 1px dashed #bbb; background: #fafafa; 
+        position: relative; cursor: pointer; overflow: hidden; 
+        display: flex; justify-content: center; align-items: center;
+      }
+      /* Cuando pasas el mouse o está cargado */
+      .card-slot:hover { border-color: #000; background: #f0f0f0; }
+      .card-slot.loaded { border: 1px solid #ddd; background: #fff; }
+
+      .card-slot input { display: none; }
+      .helper-text {
+        font-size: 10px; color: #888; text-align: center;
+        pointer-events: none; z-index: 10;
+      }
+
+      /* --- Canvas Rotado --- */
+      .preview-canvas {
+        position: absolute;
+        top: 50%; left: 50%;
+        /* DIMENSIONES INVERTIDAS: Ancho=49, Alto=78 */
+        width: 49mm; 
+        height: 78.009mm;
+        /* Rotación de -90 grados para que quede horizontal */
+        transform: translate(-50%, -50%) rotate(-90deg);
+        display: none;
+        
+        /* Aseguramos que el elemento HTML también intente cubrir */
+        object-fit: cover; 
+      }
+      .loaded .preview-canvas { display: block; }
+      .loaded .helper-text { display: none; }
+    </style>
+
+    <div class="app-layout">
+      <button onclick="downloadPDF()" class="btn-print" id="downloadBtn">
+        Descargar Plantilla A4
+      </button>
+
+      <div class="paper-a4" id="canvasArea">
+        <label class="card-slot"><input type="file" accept="application/pdf" onchange="previewPdf(this)"><span class="helper-text">PDF 1</span><canvas class="preview-canvas"></canvas></label>
+        <label class="card-slot"><input type="file" accept="application/pdf" onchange="previewPdf(this)"><span class="helper-text">PDF 2</span><canvas class="preview-canvas"></canvas></label>
+        <label class="card-slot"><input type="file" accept="application/pdf" onchange="previewPdf(this)"><span class="helper-text">PDF 3</span><canvas class="preview-canvas"></canvas></label>
+        <label class="card-slot"><input type="file" accept="application/pdf" onchange="previewPdf(this)"><span class="helper-text">PDF 4</span><canvas class="preview-canvas"></canvas></label>
+        <label class="card-slot"><input type="file" accept="application/pdf" onchange="previewPdf(this)"><span class="helper-text">PDF 5</span><canvas class="preview-canvas"></canvas></label>
+        <label class="card-slot"><input type="file" accept="application/pdf" onchange="previewPdf(this)"><span class="helper-text">PDF 6</span><canvas class="preview-canvas"></canvas></label>
+        <label class="card-slot"><input type="file" accept="application/pdf" onchange="previewPdf(this)"><span class="helper-text">PDF 7</span><canvas class="preview-canvas"></canvas></label>
+        <label class="card-slot"><input type="file" accept="application/pdf" onchange="previewPdf(this)"><span class="helper-text">PDF 8</span><canvas class="preview-canvas"></canvas></label>
+        <label class="card-slot"><input type="file" accept="application/pdf" onchange="previewPdf(this)"><span class="helper-text">PDF 9</span><canvas class="preview-canvas"></canvas></label>
+        <label class="card-slot"><input type="file" accept="application/pdf" onchange="previewPdf(this)"><span class="helper-text">PDF 10</span><canvas class="preview-canvas"></canvas></label>
+      </div>
+    </div>
+
+    <script>
+      // FACTOR DE CALIDAD Y TAMAÑO
+      // 4 = Calidad Ultra Alta (aprox 300dpi)
+      const QUALITY_SCALE = 4; 
+      
+      // Dimensiones físicas del canvas (vertical) en milímetros
+      // OJO: Estas son las dimensiones del canvas ROTADO (Portrait)
+      const CANVAS_W_MM = 49;  
+      const CANVAS_H_MM = 78.009;
+
+      async function previewPdf(input) {
+        if (input.files && input.files[0]) {
+          const file = input.files[0];
+          if (file.type !== 'application/pdf') { alert('Sube un PDF válido.'); return; }
+
+          const parent = input.parentElement;
+          const canvas = parent.querySelector('.preview-canvas');
+          const ctx = canvas.getContext('2d');
+
+          const fileReader = new FileReader();
+          fileReader.onload = async function() {
+            try {
+              const typedarray = new Uint8Array(this.result);
+              const pdf = await pdfjsLib.getDocument(typedarray).promise;
+              const page = await pdf.getPage(1);
+
+              // 1. Calcular tamaño del canvas en Píxeles (Alta Resolución)
+              // 1mm = 3.7795px
+              const pxPerMm = 3.7795 * QUALITY_SCALE;
+              const targetWidthPx = Math.ceil(CANVAS_W_MM * pxPerMm);
+              const targetHeightPx = Math.ceil(CANVAS_H_MM * pxPerMm);
+
+              canvas.width = targetWidthPx;
+              canvas.height = targetHeightPx;
+
+              // 2. Obtener dimensiones del PDF original
+              const originalViewport = page.getViewport({ scale: 1 });
+              
+              // 3. CALCULO DE ESCALA "COVER" (Rellenar todo)
+              // Comparamos ancho con ancho y alto con alto
+              const scaleX = targetWidthPx / originalViewport.width;
+              const scaleY = targetHeightPx / originalViewport.height;
+              
+              // LA CLAVE: Elegimos la escala MAYOR. 
+              // Esto asegura que el lado más corto toque el borde, y el lado largo se recorte.
+              // Multiplicamos por 1.01 (1%) para asegurar que no queden líneas blancas.
+              let finalScale = Math.max(scaleX, scaleY) * 1.01;
+
+              // 4. Generar el Viewport con la escala final
+              const viewport = page.getViewport({ scale: finalScale });
+
+              // 5. Centrar la imagen (Offset)
+              // Calculamos cuánto sobra y lo dividimos entre 2 para centrar
+              const offsetX = (targetWidthPx - viewport.width) / 2;
+              const offsetY = (targetHeightPx - viewport.height) / 2;
+
+              // 6. Limpiar y Renderizar
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.fillStyle = "white"; // Fondo blanco base
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+              const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport,
+                transform: [1, 0, 0, 1, offsetX, offsetY] // Magia de centrado
+              };
+              
+              await page.render(renderContext).promise;
+              parent.classList.add('loaded');
+
+            } catch (error) {
+              console.error(error);
+              alert('Error al procesar el PDF.');
+            }
+          };
+          fileReader.readAsArrayBuffer(file);
+        }
+      }
+
+      async function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const btn = document.getElementById('downloadBtn');
+        const element = document.getElementById('canvasArea');
+        
+        btn.innerText = "Procesando...";
+        btn.disabled = true;
+        
+        // Pausa breve para la UI
+        await new Promise(r => setTimeout(r, 100));
+
+        try {
+          const canvas = await html2canvas(element, {
+            scale: 4, // Misma escala alta para la salida
+            useCORS: true,
+            backgroundColor: '#ffffff'
+          });
+          
+          const imgData = canvas.toDataURL('image/jpeg', 1.0);
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+          
+          pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+          pdf.save('plancha-fotochecks.pdf');
+        
+        } catch (e) {
+          alert("Error: " + e.message);
+        }
+        
+        btn.innerText = "Descargar PDF (Relleno Perfecto)";
+        btn.disabled = false;
+      }
+    </script>
+  </div>
+</body>
+</html>
